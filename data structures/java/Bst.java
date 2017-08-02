@@ -4,23 +4,27 @@ import java.util.*;
 class Node <T extends Comparable <T>> {
 	Node <T> left, right, parent;
 	T data;
+	int count;
 
 	public Node (T d, Node <T> p) {
 		data = d;
 		left = right = null;
 		parent = p;
+		count = 0; // Instruccion de mas
 	}
 
 	public void insert (T value, Node <T> father) {
 		if (value.compareTo (data) < 0) {
-			if (left == null) 
+			if (left == null) {
 				left = new Node <T> (value, father);
+			}
 			else 
 				left.insert (value, left);
 		} 
 		if (value.compareTo (data) > 0) {
-			if (right == null) 
+			if (right == null) { 
 				right = new Node <T> (value, father);
+			}
 			else 
 				right.insert (value, right);
 		} 
@@ -63,49 +67,53 @@ class Node <T extends Comparable <T>> {
 			old.parent.right = replace;
 		if (replace != null) 
 			replace.parent = old.parent;
-		old = null; // ? 
+		old = null;  
 	}
 
-	public void delete(T value) {
-		Node <T>remove = this.get (value);
-		if (remove == null) {
-			System.out.println("No exists the value " + value);
-			return;
-		}
+	public boolean delete (T value) {
+		Node <T> remove = this.get (value);
+		if (remove == null) 
+			return false;
 		if (remove.left == null)
 			transplant(remove, remove.right);
 		else if (remove.right == null) 
-			transplant(remove, remove.left);
+			transplant (remove, remove.left);
 		else {
 			Node <T> min = remove.right.minimum();
 			T temp = min.data;
 			min.delete(min.data);
 			remove.data = temp;
 		}
+		return true;
 	}
+
 }
 
 public class Bst <T extends Comparable <T>> {
 	private Node <T> root;
 
-	public Bst () {
-		root = null;
+	public Bst () { root = null; }
+
+	public void delete (T data) { 
+		root.delete (data);
+		root.count--;
+		if (root.count == 0) // Parche
+			root = null;
 	}
 
-	public void delete (T data) {
-		root.delete (data);
-	}
+	public int size () { return root.count; }
 
 	public void insert (T data) {
 		if (root == null)
 			root = new Node <T> (data, null);
 		else 
 			root.insert (data, root);
+		root.count++;
 	}
 
 	public void inorder () {
 		inorderHelper (root);
-		System.out.println();
+		System.out.println ();
 	}
 
 	private void inorderHelper (Node <T> node) {
@@ -127,13 +135,9 @@ public class Bst <T extends Comparable <T>> {
 		return current.data;
 	}
 
-	public T maximum() {
-		return root.maximum().data;
-	}
+	public T maximum() { return root.maximum().data; }
 
-	public T minimum() {
-		return root.minimum().data;
-	}
+	public T minimum() { return root.minimum().data; }
 
 	public T successor (T value) {
 		Node <T> current = root.get (value);
