@@ -1,26 +1,26 @@
 
 import java.util.*;
 
-class TreeNode <T extends Comparable <T>> {
-	TreeNode <T> left, right, parent;
+class Node <T extends Comparable <T>> {
+	Node <T> left, right, parent;
 	T data;
 
-	public TreeNode (T d, TreeNode <T> p) {
+	public Node (T d, Node <T> p) {
 		data = d;
 		left = right = null;
 		parent = p;
 	}
 
-	public void insert (T value, TreeNode <T> father) {
+	public void insert (T value, Node <T> father) {
 		if (value.compareTo (data) < 0) {
 			if (left == null) 
-				left = new TreeNode <T> (value, father);
+				left = new Node <T> (value, father);
 			else 
 				left.insert (value, left);
 		} 
 		if (value.compareTo (data) > 0) {
 			if (right == null) 
-				right = new TreeNode <T> (value, father);
+				right = new Node <T> (value, father);
 			else 
 				right.insert (value, right);
 		} 
@@ -30,7 +30,7 @@ class TreeNode <T extends Comparable <T>> {
 		return left == null && right == null && data != null;
 	}
 
-	public TreeNode <T> get (T value) {
+	public Node <T> get (T value) {
 		if (data != null) {
 			if (value.compareTo (data) == 0)
 				return this;
@@ -42,19 +42,19 @@ class TreeNode <T extends Comparable <T>> {
 		return null;
 	}
 
-	public TreeNode <T> minimum () {
+	public Node <T> minimum () {
 		if (left == null)
 			return this;
 		return left.minimum ();
 	}
 
-	public TreeNode <T> maximum () {
+	public Node <T> maximum () {
 		if (right == null)
 			return this;
 		return right.maximum ();
 	}
 
-	private void transplant(TreeNode <T> old, TreeNode <T> replace){
+	private void transplant(Node <T> old, Node <T> replace){
 		if (old.parent == null)  
 			old = replace;
 		else if (old.parent.left == old) 
@@ -62,11 +62,12 @@ class TreeNode <T extends Comparable <T>> {
 		else
 			old.parent.right = replace;
 		if (replace != null) 
-			old.parent = replace.parent;
+			replace.parent = old.parent;
+		old = null; // ? 
 	}
 
 	public void delete(T value) {
-		TreeNode <T>remove = this.get (value);
+		Node <T>remove = this.get (value);
 		if (remove == null) {
 			System.out.println("No exists the value " + value);
 			return;
@@ -76,7 +77,7 @@ class TreeNode <T extends Comparable <T>> {
 		else if (remove.right == null) 
 			transplant(remove, remove.left);
 		else {
-			TreeNode <T> min = remove.right.minimum();
+			Node <T> min = remove.right.minimum();
 			T temp = min.data;
 			min.delete(min.data);
 			remove.data = temp;
@@ -85,7 +86,7 @@ class TreeNode <T extends Comparable <T>> {
 }
 
 public class Bst <T extends Comparable <T>> {
-	private TreeNode <T> root;
+	private Node <T> root;
 
 	public Bst () {
 		root = null;
@@ -97,7 +98,7 @@ public class Bst <T extends Comparable <T>> {
 
 	public void insert (T data) {
 		if (root == null)
-			root = new TreeNode <T> (data, null);
+			root = new Node <T> (data, null);
 		else 
 			root.insert (data, root);
 	}
@@ -107,7 +108,7 @@ public class Bst <T extends Comparable <T>> {
 		System.out.println();
 	}
 
-	private void inorderHelper (TreeNode <T> node) {
+	private void inorderHelper (Node <T> node) {
 		if (node == null) {
 			System.out.print("-");
 			return;
@@ -120,7 +121,7 @@ public class Bst <T extends Comparable <T>> {
 	}
 
 	public T search (T value) {
-		TreeNode <T> current = root.get (value);
+		Node <T> current = root.get (value);
 		if (current == null)
 			return null;
 		return current.data;
@@ -135,7 +136,7 @@ public class Bst <T extends Comparable <T>> {
 	}
 
 	public T successor (T value) {
-		TreeNode <T> current = root.get (value);
+		Node <T> current = root.get (value);
 		if (current == null)
 			return null;
 		if (current.right != null) 
