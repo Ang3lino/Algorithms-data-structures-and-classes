@@ -21,19 +21,37 @@ static vectorNode *newNode (E e) {
 
 void vectorPushBack (Vector *v, E e) {
 	vectorNode *node = newNode (e);
+	if (v->front == nil) { // En el caso de que v sea vacio
+		v->front = node;
+		v->back = node;  
+	}
 	node->prev = v->back;
 	v->back->next = node;
 	v->back = node;
 }
 
-void vectorAdd (Vector *v, int index, E element) {
-	vectorNode *node = newNode (element);
-	if (v == nil && index == 0) {
+void vectorPushFront (Vector *v, E e) {
+	vectorNode *node = newNode (e);
+	if (v->front == nil) { // En el caso de que v sea vacio
 		v->front = node;
 		v->back = node; 
-	} else if (index >= v->size)
+	}
+	node->next = v->front;
+	v->front->prev = node;
+	v->front = node;
+}
+
+void vectorAdd (Vector *v, int index, E element) {
+	if (v->front == nil && index == 0) {
+		vectorNode *node = newNode (element);
+		v->front = node;
+		v->back = node; 
+	} else if (index == 0) 
+		vectorPushFront (v, element);
+	else if (index >= v->size - 1)
 		vectorPushBack (v, element);
-	else if (index < v->size) {
+	else {
+		vectorNode *node = newNode (element);
 		int pos = 0;
 		vectorNode *ptr = v->front;
 		while (pos < index) {
@@ -44,17 +62,10 @@ void vectorAdd (Vector *v, int index, E element) {
 		node->prev = ptr->prev;
 		ptr->prev->next = node;
 		ptr->prev = node;
-		if (index == 0) 
-			v->front = node;
-		if (index == v->size - 1)
-			v->back = node;
-	} else {
-		perror ("Error at vectorAdd: Se esta insertando un elemento en un indice invalido. \n");
-		exit (EXIT_FAILURE);
-	}
+	} 
 	v->size++;
 }
-		
+
 E vectorGet (Vector *v, int index) {
 	vectorNode *ptr = v->front;
 	int i = 0;
