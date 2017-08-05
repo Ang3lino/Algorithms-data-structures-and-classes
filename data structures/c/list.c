@@ -1,6 +1,18 @@
 
 #include "list.h"
 
+// Esta funcion se tendra que modificar de acuerdo a 
+// los campos que contenga la estructura element
+static bool elementEquals (E e1, E e2) {
+	if (e1.Double != e2.Double) 
+		return false;
+	if (e1.Integer != e2.Integer) 
+		return false;
+	if (strncmp (e1.String, e2.String, 100) != 0)
+		return false;
+	return true;
+}
+
 List *newList () {
 	List *v = (List *) calloc (sizeof (List), 1);
 	v->front = 0;
@@ -19,21 +31,23 @@ List *listSetSize (size_t size) {
 	return lista;
 }
 
-// Funciona apropiadamente ssi 0 <= lowLim <= highLim y mainList es no vacia
-// Problemas encontrados...
 List *listSubList (List *mainList, size_t lowLim, size_t highLim) {
 	List *subList = newList ();
 	listNode *node = mainList->front;
 	int i = 0;
-	if (lowLim <= highLim && mainList->size != 0) {
-		while (i++ < lowLim) // i++ funciona como se debe ?
+	if (lowLim < highLim && mainList->size != 0 && highLim < mainList->size) {
+		while (i < lowLim) { 
 			node = node->next;
-		while (i++ < highLim) {
+			++i;
+		}
+		listPushBack (subList, node->e);
+		while (i < highLim) {
+			node = node->next;
 			listPushBack (subList, node->e);
-			node = node->next;
+			++i;
 		} 
 	} else {
-		perror ("Error at listSubList: Se esta tratando" 
+		perror ("Error at listSubList: Se esta tratando " 
 			"de generar una sublista con limites invalido.");
 		exit (EXIT_FAILURE);
 	}
@@ -42,6 +56,10 @@ List *listSubList (List *mainList, size_t lowLim, size_t highLim) {
 
 static listNode *newNode (E e) {
 	listNode *nuevoNodo = (listNode *) calloc (sizeof (listNode), 1);
+	if (nuevoNodo == nil) {
+		perror ("Se acabo la memoria chavo :c \n");
+		exit (EXIT_FAILURE);
+	}
 	nuevoNodo->prev = 0;
 	nuevoNodo->next = 0;
 	nuevoNodo->e = e;
@@ -79,7 +97,7 @@ void listPushFront (List *v, E e) {
 }
 
 // En caso de que index sea mayor que el v->size, se pondra el elemento al final
-void listAdd (List *v, int index, E element) {
+void listAdd (List *v, size_t index, E element) {
 	if (index == 0) 
 		listPushFront (v, element);
 	else if (index >= v->size)
@@ -98,6 +116,31 @@ void listAdd (List *v, int index, E element) {
 		ptr->prev = node;
 		v->size++;
 	} 
+}
+
+bool listSet (List *lista, size_t index, E e) {
+	if (index < lista->size) {
+		int i = 0;
+		listNode *ptr;
+		if (index < lista->size / 2) {
+			ptr = lista->front;
+			while (i < index) {
+				ptr = ptr->next;
+				i++;
+			}
+			ptr->e = e;
+		} else {
+			ptr = lista->back;
+			i = lista->size - 1;
+			while (i > index) {
+				ptr = ptr->prev;
+				i--;
+			}
+			ptr->e = e;
+		}
+		return true;
+	}
+	return false;
 }
 
 E listGet (List *v, size_t index) {
@@ -156,10 +199,10 @@ E listPopBack (List *list) {
 	return e;
 }
 
-void listDelete (List *list, int index) { // looks good :D
+void listDelete (List *list, size_t index) { 
 	if (list->size != 0) {
 		listNode *del;
-		if (index == 0) 
+		if (index == 0) // borramos el principio
 			listPopFront (list);
 		else if (index < list->size - 1) { // Borramos en medio
 			int i = 0;
@@ -173,7 +216,7 @@ void listDelete (List *list, int index) { // looks good :D
 			ptr->prev->next = ptr->next;
 			--list->size;
 			free (del);
-		} else  
+		} else // Borramos el final 
 			listPopBack (list);
 	}
 }
@@ -181,16 +224,6 @@ void listDelete (List *list, int index) { // looks good :D
 void listClean (List *list) {
 	while (list->size) 
 		listPopBack (list);
-}
-
-static bool elementEquals (E e1, E e2) {
-	if (e1.Double != e2.Double) 
-		return false;
-	if (e1.Integer != e2.Integer) 
-		return false;
-	if (strncmp (e1.String, e2.String, 100) != 0)
-		return false;
-	return true;
 }
 
 // Se retorna el puntero al nodo de la lista que contenga al 
@@ -205,6 +238,12 @@ static listNode *getNode (List *list, E e) {
 		}
 	} 
 	return nil;
+}
+
+bool listContains (List *lista, E e) {
+	if (getNode (lista, e))
+		return true;
+	return false;
 }
 
 bool listRemove (List *list, E e) {
@@ -226,3 +265,19 @@ bool listRemove (List *list, E e) {
 	}
 	return false;
 }
+
+// Se retornara -1 en caso de que e no pertenezca a al lista
+int listIndexOf (List *lista, E e) {
+	if (lista->size >= 0) {
+		int i = 0;
+		listNode *current = lista->front;
+		while (current) {
+			if (elementEquals (e, current->e))
+				return i;
+			current = current->next;
+			i++;
+		}
+	}	
+	return -1;
+}
+
