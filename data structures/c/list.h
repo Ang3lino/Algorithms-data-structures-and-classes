@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <errno.h>
 #include <stdbool.h>
 #include <stdarg.h>
@@ -25,29 +26,30 @@ typedef struct listNode {
 typedef struct list {
 	listNode *front, 
              *back;
-	int size;
+	size_t size;
 } List;
 
 typedef Element E;
 
 List *newList ();
-List *listSetSize (int);
-List *listSublist (List *, int, int);
+List *listSetSize (size_t);
+List *listSubList (List *, size_t, size_t);
 
 void listAdd (List *, int, Element);
 void listClean (List *);
-void listRemove (List *, Element);
 void listDelete (List *, int);
 void listSet (List *, Element, int);
 void listPushBack (List *, Element);
 
-int listEquals (List *, int, Element);
+bool listRemove (List *, Element);
+bool listContains (List *, Element);
+bool listEquals (List *, int, Element);
+
 int listCapacity (List *);
-int listContains (List *, Element);
 int listIndexOf (List *, Element);
 
 Element listLastElement (List *);
-Element listGet (List *, int);
+Element listGet (List *, size_t);
 Element listPopFront (List *);
 Element listPopBack (List *);
 
