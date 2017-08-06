@@ -1,88 +1,81 @@
 
 #include "vector.h"
 
-Vector *newVector () {
-	Vector *v = (Vector *) calloc (sizeof (Vector), 1);
-	v->front = 0;
-	v->back = 0;
-	v->size = 0;
-
-	return v;
+Vector *
+newVector (void) {
+    Vector *v = malloc (sizeof (Vector));
+    v->capacity = 10;
+    v->size = 0;
+    v->item = calloc (sizeof (void *), v->capacity);
+    return v;
 }
 
-static vectorNode *newNode (E e) {
-	vectorNode *nuevoNodo = (vectorNode *) calloc (sizeof (vectorNode), 1);
-	nuevoNodo->prev = 0;
-	nuevoNodo->next = 0;
-	nuevoNodo->e = e;
-	
-	return nuevoNodo;
+static void 
+resize (Vector *v) {
+    v->capacity *= 2;
+	v->item = realloc (v->item, sizeof (void *) * v->capacity);
+    if (v->item == NULL) {
+        perror ("Se acabo la memoria. D: \n");
+        exit (EXIT_FAILURE);
+    }
 }
 
-void vectorPushBack (Vector *v, E e) {
-	vectorNode *node = newNode (e);
-	if (v->front == nil) { // En el caso de que v sea vacio
-		v->front = node;
-		v->back = node;  
-	}
-	node->prev = v->back;
-	v->back->next = node;
-	v->back = node;
+void 
+vectorPushBack (Vector *v, void *data) {
+    v->item[v->size++] = data;
+    if (v->size == v->capacity)
+        resize (v);
 }
 
-void vectorPushFront (Vector *v, E e) {
-	vectorNode *node = newNode (e);
-	if (v->front == nil) { // En el caso de que v sea vacio
-		v->front = node;
-		v->back = node; 
-	}
-	node->next = v->front;
-	v->front->prev = node;
-	v->front = node;
+void 
+vectorPushFront (Vector *v, void *data) {
+    int i;
+    if (v->size + 1 >= v->capacity)
+        resize (v);
+    for (i = 0; i < v->size; i++) 
+        v->item[i + 1] = v->item[i];
+    v->item[0] = data;
+    v->size++;
 }
 
-void vectorAdd (Vector *v, int index, E element) {
-	if (v->front == nil && index == 0) {
-		vectorNode *node = newNode (element);
-		v->front = node;
-		v->back = node; 
-	} else if (index == 0) 
-		vectorPushFront (v, element);
-	else if (index >= v->size - 1)
-		vectorPushBack (v, element);
-	else {
-		vectorNode *node = newNode (element);
-		int pos = 0;
-		vectorNode *ptr = v->front;
-		while (pos < index) {
-			ptr = ptr->next;
-			pos++;
-		}
-		node->next = ptr;
-		node->prev = ptr->prev;
-		ptr->prev->next = node;
-		ptr->prev = node;
-	} 
-	v->size++;
+void 
+vectorResize (Vector *v, size_t len) {
+    while (v->capacity < len)
+        resize (v);
 }
 
-E vectorGet (Vector *v, int index) {
-	vectorNode *ptr = v->front;
-	int i = 0;
-	while (ptr != nil && i < index) {
-		ptr = ptr->next;
-		++i;
-	}
-	if (ptr == nil) {
-		perror ("Error at vectorGet: Se esta consultando un elemento con un indice mayor a la"
-				"capacidad del vector. \n");
-		exit (EXIT_FAILURE); 
-	}
-	return ptr->e;
+T 
+vectorPopBack (Vector *v) {
+    if (v->size <= 0) {
+        perror ("Error at vectorPopBack: Se pretende " 
+                "excarvar en el vacio. -___- \n");
+        exit (EXIT_FAILURE);
+    }
+    v->size--;
+    return v->item[v->size];
 }
 
+void 
+vectorSet (Vector *v, size_t index, void *data) {
+    if (index < v->size && index >= 0) 
+        v->item[index] = data;
+    else {
+        perror ("Error at vectorSet: Indice invalido -__- \n");
+        exit (EXIT_FAILURE);
+    }
+}
 
-
-
-
-		
+void
+vectorAdd (Vector *v, size_t index, void *data) {
+    if (index >= v->size || index < 0) {
+        perror ("Error at vectorAdd: Indice invalido -__- \n");
+        exit (EXIT_FAILURE);
+    }
+    int i;
+    if (v->size + 1 >= v->capacity)
+        resize (v);
+    for (i = index; i < v->size; i++)
+        v->item[i + 1] = v->item[i];
+    v->item[index] = data;
+    
+}
