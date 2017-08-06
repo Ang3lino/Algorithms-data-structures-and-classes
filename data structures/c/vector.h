@@ -2,9 +2,12 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
+//#define NDEBUG
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 #include <errno.h>
 
 // size_t es un unsigned int

@@ -4,7 +4,7 @@
 Vector *
 newVector (void) {
     Vector *v = malloc (sizeof (Vector));
-    v->capacity = 10;
+    v->capacity = 2;
     v->size = 0;
     v->item = calloc (sizeof (void *), v->capacity);
     return v;
@@ -27,18 +27,16 @@ vectorPushBack (Vector *v, void *data) {
         resize (v);
 }
 
-void 
+void // Se pone un null al final
 vectorPushFront (Vector *v, void *data) {
-    int i;
-    if (v->size + 1 >= v->capacity)
+    v->size++;  
+    if (v->size > v->capacity)
         resize (v);
-    for (i = 0; i < v->size; i++) 
-        v->item[i + 1] = v->item[i];
+	v->item[1] = v->item[0]; 
     v->item[0] = data;
-    v->size++;
 }
 
-void 
+void // Se debe hacer que len > 0
 vectorResize (Vector *v, size_t len) {
     while (v->capacity < len)
         resize (v);
@@ -51,8 +49,7 @@ vectorPopBack (Vector *v) {
                 "excarvar en el vacio. -___- \n");
         exit (EXIT_FAILURE);
     }
-    v->size--;
-    return v->item[v->size];
+    return v->item[--v->size];
 }
 
 void 
@@ -60,22 +57,27 @@ vectorSet (Vector *v, size_t index, void *data) {
     if (index < v->size && index >= 0) 
         v->item[index] = data;
     else {
-        perror ("Error at vectorSet: Indice invalido -__- \n");
+        perror ("Error at vectorSet: Indice invalido -__- ");
         exit (EXIT_FAILURE);
     }
 }
 
-void
+void  
 vectorAdd (Vector *v, size_t index, void *data) {
     if (index >= v->size || index < 0) {
-        perror ("Error at vectorAdd: Indice invalido -__- \n");
+        perror ("Error at vectorAdd: Indice invalido -__- ");
         exit (EXIT_FAILURE);
     }
-    int i;
-    if (v->size + 1 >= v->capacity)
+    int i, j;
+	void **temp = malloc (sizeof (void *) * (v->size - index)); 
+	for (i = index, j = 0; i < v->size; i++, j++) 
+		temp[j] = v->item[i];
+	v->size++;
+    if (v->size > v->capacity)
         resize (v);
-    for (i = index; i < v->size; i++)
-        v->item[i + 1] = v->item[i];
+    for (i = index + 1, j = 0; i < v->size; i++, j++)
+        v->item[i] = temp[j];
     v->item[index] = data;
-    
+	free (temp);
 }
+
