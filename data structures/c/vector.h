@@ -2,8 +2,6 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
-//#define NDEBUG
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -20,7 +18,6 @@ typedef struct vector {
 typedef void *T; // Emulacion generica
 
 Vector *newVector (void);
-// Vector *vectorReserve (const size_t);
 T vectorPopBack (Vector *);
 T vectorPopFront (Vector *);
 
@@ -33,3 +30,4 @@ void vectorAdd (Vector *, size_t, void *);
 void vectorSet (Vector *, size_t, void *);
 
 #endif
+

@@ -22,19 +22,37 @@ resize (Vector *v) {
 
 void 
 vectorPushBack (Vector *v, void *data) {
-    v->item[v->size++] = data;
-    if (v->size == v->capacity)
+    if (v->size  + 1 >= v->capacity)
         resize (v);
+    v->item[v->size++] = data;
 }
 
-void // Se pone un null al final
+static void 
+moveSubVectorOneStepRight (Vector *v, int a) {
+	int i;
+	for (i = v->size - 1; i >= a; i--)
+		v->item[i + 1] = v->item[i];
+}
+
+void 
+vectorPushFront (Vector *v, void *data) {
+    v->size++;  
+	int i;
+    if (v->size > v->capacity)
+        resize (v);
+	moveSubVectorOneStepRight (v, 0);
+	v->item[0] = data;
+}
+
+/*
+void // Error: Se pone un null al final
 vectorPushFront (Vector *v, void *data) {
     v->size++;  
     if (v->size > v->capacity)
         resize (v);
 	v->item[1] = v->item[0]; 
     v->item[0] = data;
-}
+}*/
 
 void // Se debe hacer que len > 0
 vectorResize (Vector *v, size_t len) {
@@ -68,16 +86,7 @@ vectorAdd (Vector *v, size_t index, void *data) {
         perror ("Error at vectorAdd: Indice invalido -__- ");
         exit (EXIT_FAILURE);
     }
-    int i, j;
-	void **temp = malloc (sizeof (void *) * (v->size - index)); 
-	for (i = index, j = 0; i < v->size; i++, j++) 
-		temp[j] = v->item[i];
-	v->size++;
-    if (v->size > v->capacity)
-        resize (v);
-    for (i = index + 1, j = 0; i < v->size; i++, j++)
-        v->item[i] = temp[j];
-    v->item[index] = data;
-	free (temp);
+	moveSubVectorOneStepRight (v, index);
+	v->item[index] = data;
 }
 
