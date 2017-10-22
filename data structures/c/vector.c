@@ -44,16 +44,6 @@ vectorPushFront (Vector *v, void *data) {
 	v->item[0] = data;
 }
 
-/*
-void // Error: Se pone un null al final
-vectorPushFront (Vector *v, void *data) {
-    v->size++;  
-    if (v->size > v->capacity)
-        resize (v);
-	v->item[1] = v->item[0]; 
-    v->item[0] = data;
-}*/
-
 void // Se debe hacer que len > 0
 vectorResize (Vector *v, size_t len) {
     while (v->capacity < len)
@@ -90,3 +80,8 @@ vectorAdd (Vector *v, size_t index, void *data) {
 	v->item[index] = data;
 }
 
+void 
+vectorClear(Vector *v) {
+    free(v->item);
+    free(v);
+}

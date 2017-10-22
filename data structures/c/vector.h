@@ -24,7 +24,7 @@ T vectorPopFront (Vector *);
 void vectorResize (Vector *, size_t);
 void vectorPushBack (Vector *, void *);
 void vectorPushFront (Vector *, void *);
-void vectorClean (Vector *);
+void vectorClear (Vector *);
 void vectorResize (Vector *, size_t);
 void vectorAdd (Vector *, size_t, void *);
 void vectorSet (Vector *, size_t, void *);
