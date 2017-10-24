@@ -2,14 +2,14 @@
 #include "rational.h"
 
 long 
-gcd (long n1, long n2) {
-	while (n1 != n2) {
-        if (n1 > n2)
-            n1 -= n2;
-        else
-            n2 -= n1;
+gcd(long a, long b){
+    long r;
+    while(b != 0) {
+		r = a % b;
+		 a = b; 
+		b = r;
 	}
-	return n1;
+    return a;
 }
 
 void 
@@ -76,6 +76,7 @@ rationalProduct(Rational *p, Rational *q) {
 	Rational *r = newRational();
 	r->a = p->a * q->a;
 	r->b = p->b * q->b;
+	rationalSimplify(r);
 	return r;
 }
 

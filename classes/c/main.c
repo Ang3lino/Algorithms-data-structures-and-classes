@@ -1,6 +1,6 @@
 
 #include "matrix.h"
-#define ord 9
+#define ord 2
 
 MatrixHandler mh;
 RationalHandler rh;
@@ -10,11 +10,18 @@ main (void) {
     initMatrixHandler(&mh);
     initRationalHandler(&rh);
 
-    Rational *r = newRational();
     Matrix *a = mh.rand(ord, ord), *b = mh.rand(ord, ord), *c;
+    Rational *r = newRational();
     mh.print(a);
-    c = mh.adj(a);
-    mh.print(c);
-    printf("\n");
+    //r = mh.det(a);
+    detPivot(a, 0);
+    mh.print(a);
+    detPivot(a, 1);
+    mh.print(a);
+    detPivot(a, 2);
+    mh.print(a);
+    detPivot(a, 3);
+    mh.print(a);
+    puts("");
     return 0;
 }

@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
+#include <stdbool.h>
 #include "rational.h"
 
 typedef struct matrix {
@@ -18,6 +19,7 @@ typedef struct matrix {
 
 typedef struct matrixHandler 
 {
+    Matrix *(*new)(int, int);
     Matrix *(*add)(Matrix *, Matrix *);
     Matrix *(*prod)(Matrix *, Matrix *);
     Matrix *(*subt)(Matrix *, Matrix *);
@@ -29,6 +31,7 @@ typedef struct matrixHandler
 
     Rational *(*det)(Matrix *);
     Rational *(*cof)(Matrix *, int, int);
+    Rational *(*get)(Matrix *, int, int);
 
     void (*print)(Matrix *);
 } MatrixHandler;
@@ -46,8 +49,10 @@ Matrix *matrixEscalarProduct(Matrix *, Rational *);
 
 Rational *matrixDeterminant(Matrix *);
 Rational *matrixCofactor(Matrix *, int, int);
+Rational *matrixGet(Matrix *, int, int);
 
 void matrixPrinter(Matrix *);
 void initMatrixHandler(MatrixHandler *);
+void swapRows(Matrix *, int , int);
 
 #endif

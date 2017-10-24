@@ -12,10 +12,12 @@ initMatrixHandler(MatrixHandler *mh) {
     mh->escProd = matrixEscalarProduct; 
     mh->rand = matrixRandom;
     mh->minor = matrixMinor;
+    mh->new = newMatrix;
 
     // Rational *
     mh->det = matrixDeterminant;
     mh->cof = matrixCofactor;
+    mh->get = matrixGet;
     
     // void
     mh->print = matrixPrinter;
@@ -25,7 +27,8 @@ Matrix *
 matrixRandom(int x, int y) {
     int i, j;
     Matrix *a = newMatrix(x, y);
-    srand(time(NULL));
+    //srand(time(NULL));
+    srand(0);
     for (i = 0; i < x; i++) 
         for (j = 0; j < y; j++) {
             a->mat[i][j]->a = rand() % 10;
@@ -190,19 +193,118 @@ matrixCofactor(Matrix *a, int i, int j) {
 }
 
 Rational *
-matrixDeterminant(Matrix *a) {
-    if (a->m != a->n) {
-        perror("Determinant for not squared matrices is undefined.");
-        exit(-1);
+matrixGet(Matrix *a, int i, int j) {
+    return a->mat[i][j];
+}
+
+void 
+swapRows(Matrix *a, int x, int y) {
+    Rational *r = newRational();
+    int j;
+    for (j = 0; j < a->n; j++) {
+        r = a->mat[x][j];
+        a->mat[x][j] = a->mat[y][j];
+        a->mat[y][j] = r;
     }
-    if (a->m == 1) 
-        return a->mat[0][0];
-    Rational *r = newRational(); 
+}
+
+void 
+multRow(Matrix *a, int x, Rational *esc) {
+    int j;
     RationalHandler rh;
     initRationalHandler(&rh);
+    for (j = 0; j < a->n; j++)
+        a->mat[x][j] = rh.prod(esc, a->mat[x][j]);
+}
+
+// R[q] <- R[p] + R[q]
+void 
+addRows(Matrix *a, int p, int q) {
     int j;
+    RationalHandler rh;
+    initRationalHandler(&rh);
+    for (j = 0; j < a->n; j++)
+        a->mat[q][j] = rh.add(a->mat[p][j], a->mat[q][j]);
+}
+
+// warning, it's not a elementary row operation
+void 
+subtractRows(Matrix *a, int p, int q) {
+    int j;
+    RationalHandler rh;
+    initRationalHandler(&rh);
+    for (j = 0; j < a->n; j++)
+        a->mat[q][j] = rh.sub(a->mat[p][j], a->mat[q][j]);
+}
+
+// rx <- rx + a ry
+void 
+addMultRows(Matrix *a, int x, int y, Rational *esc) {
+    int i, j;
+    RationalHandler rh;
+    initRationalHandler(&rh);
     for (j = 0; j < a->n; j++) 
-        r = rh.add(r, rh.prod(a->mat[0][j], matrixCofactor(a, 0, j)));
+        a->mat[x][j] = rh.add(a->mat[x][j], rh.prod(esc, a->mat[y][j]));
+}
+
+int 
+detPivot(Matrix *a, int x) {
+    int i, j, l = x + 1;
+    Rational *r = newRational(), *minusOne = newRational();
+    minusOne->a = -1;
+    RationalHandler rh;
+    initRationalHandler(&rh);
+    while (a->mat[x][x] == 0 && l < a->n) {
+        swapRows(a, x, l++);
+        matrixPrinter(a);
+    }
+    if (l == a->m)
+        return 0;
+    for (i = x; i < a->m - 1; i++) {
+        if (a->mat[i][x] == 0)
+            continue;
+        r = rh.quot(rh.prod(minusOne, a->mat[i + 1][x]), a->mat[i][x]);
+        addMultRows(a, i + 1, i, r);
+    }
+    return 1;
+}
+
+Rational *
+matrixDeterminant(Matrix *a) {
+    if (a->m != a->n) {
+        perror("No mames, det(A) con A no cuadrada no esta definido. ");
+        exit(-1);
+    }
+    Rational *r = newRational();
+    RationalHandler rh;
+    int i;
+    for (i = 0; i < a->m; i++) {
+        //matrixPrinter(a);
+        if (detPivot(a, i) == 0)
+            return r; // r = 0
+    }
+    initRationalHandler(&rh);
+    r->a = 1;
+    for (i = 0; i < a->m; i++) 
+        r = rh.prod(r, a->mat[i][i]);
     return r;
 }
 
+/*
+    Rational *
+    matrixDeterminant(Matrix *a) {
+        if (a->m != a->n) {
+            perror("Determinant for not squared matrices is undefined.");
+            exit(-1);
+        }
+        if (a->m == 1) 
+            return a->mat[0][0];
+        Rational *r = newRational(); 
+        RationalHandler rh;
+        initRationalHandler(&rh);
+        int j;
+        for (j = 0; j < a->n; j++) 
+            r = rh.add(r, rh.prod(a->mat[0][j], matrixCofactor(a, 0, j)));
+        return r;
+    }
+*/
