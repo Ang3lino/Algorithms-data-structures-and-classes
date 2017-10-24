@@ -1,6 +1,40 @@
 
 #include "rational.h"
 
+long 
+gcd (long n1, long n2) {
+	while (n1 != n2) {
+        if (n1 > n2)
+            n1 -= n2;
+        else
+            n2 -= n1;
+	}
+	return n1;
+}
+
+void 
+rationalSimplify(Rational *r) {
+	if (r->a == 0) 
+		r->b = 1;
+	else {
+		if (r->a < 0 && r->b < 0) {
+			r->a *= -1;
+			r->b *= -1;
+		}
+		long mcd = gcd(r->a, r->b);
+		r->a /= mcd;
+		r->b /= mcd;
+	}
+}
+
+void 
+rationalPrint(Rational *r) {
+	if (r->b == 1) 
+		printf("%ld", r->a);
+	else
+		printf("%ld/%ld", r->a, r->b);
+}
+
 void 
 initRationalHandler(RationalHandler *rh) {
 	rh->add = rationalAdd;
@@ -8,6 +42,10 @@ initRationalHandler(RationalHandler *rh) {
 	rh->prod = rationalProduct;
 	rh->quot = rationalQuotient;
 	rh->rec = rationalReciprocal;
+
+	//void 
+	rh->simp = rationalSimplify;
+	rh->print = rationalPrint;
 }
 
 Rational *
