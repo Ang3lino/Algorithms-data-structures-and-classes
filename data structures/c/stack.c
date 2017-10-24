@@ -2,6 +2,17 @@
 
 #include "stack.h"
 
+void 
+initStackHandler(StackHandler *s) {
+    s->new = newStack;				
+    s->clear = stackClear; 
+    s->size = stackSize;   
+    s->empty = stackEmpty;
+    s->push = stackPush; 
+    s->pop = stackPop;  
+    s->top = stackTop; 
+}
+
 /*  Funcion: newStack
  *  Caracteristicas: Declara una nueva stack mediante la instruccion 
  *  	Stack *name = newStack ();
@@ -18,7 +29,7 @@ Stack *newStack (void) {
 	Recibe: Stack *p (apuntador a Stack)
 	Devuelve: 
 	Observaciones: la Stack debe de estar referenciada correctamente por el usuario */
-void destroy (Stack *p) {
+void stackClear(Stack *p) {
 	nodo *tmp;
 	while (p->tope != NULL) {
 		tmp = p->tope->abajo;
@@ -32,7 +43,7 @@ void destroy (Stack *p) {
 	Recibe: Stack *p (apuntador a Stack)
 	Devuelve: int (tamaño de la Stack, siempre ≥ 0)
 	Observaciones: es necesaria una referencia válida a la Stack y que esté inicializada */
-inline int stackSize(Stack *p){
+int stackSize(Stack *p){
 	return p->tamano;
 }
 
@@ -48,7 +59,7 @@ inline bool stackEmpty(Stack *p){
 	Devuelve: boolean (true si la inserción fue correcta, false en caso de que la función 
 			  malloc() no haya podido apartar memoria)
 	Observaciones: es necesaria una referencia válida a la Stack y que esté inicializada */
-bool push (Stack *p, element e) {
+bool stackPush (Stack *p, element e) {
 	bool r;
 	nodo *nuevo = (nodo*) malloc (sizeof (nodo));
 	if (!nuevo)
@@ -69,7 +80,7 @@ bool push (Stack *p, element e) {
 	Observaciones: es necesaria una referencia válida a la Stack y que esté inicializada.
 			       Además, si la Stack estaba vacía, devuelve un element e no especificado; 
 				   y se asume que la función free() siempre puede liberar memoria.  */
-element pop (Stack *p) {
+element stackPop(Stack *p) {
 	element e;
 	nodo * tmp;
 	if (!stackEmpty (p)) {
@@ -87,7 +98,7 @@ element pop (Stack *p) {
 	Devuelve: element (element que se desempiló)
 	Observaciones: es necesaria una referencia válida a la Stack y que esté inicializada.
 	Además, si la Stack estaba vacía, devuelve un element e no especificado  */
-element top(Stack *p){
+element stackTop(Stack *p){
 	element e;
 	if (!stackEmpty (p)){
 		e = p->tope->e;

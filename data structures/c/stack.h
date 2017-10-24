@@ -19,24 +19,38 @@ typedef struct element {
 // enlace al nodo de abajo
 typedef struct nodo{
 	element e;           //Elemento a almacenar en cada nodo de la pila
-	struct nodo * abajo;  //Apuntador al nodo de abajo
+	struct nodo *abajo;  //Apuntador al nodo de abajo
 } nodo;
 
 // Definimos la pila, que incluirá un apuntador a nodo representando el tope de la pila y 
 // una variable entera para almacenar el tamaño
 typedef struct stack{
-	nodo * tope;
+	nodo *tope;
 	int tamano;
 } Stack;
 
+typedef struct stackHandler {
+    Stack *(*new)(void);				//Declara la stack
+    void (*clear)(Stack *);             //Eliminar la Stack
+    int (*size)(Stack *);                 //Obtener el número de elementos en la Stack
+    bool (*empty)(Stack *);          //Verificar si la Stack está vacía
+    bool (*push)(Stack *, element e); //Empilar, introducir un elemento a la Stack
+    element (*pop)(Stack *p);             //Desempilar, sacar un elemento de la Stack
+    element (*top)(Stack *p);             //Consultar el elemento del tope de la Stack sin sacarlo
+
+   
+} StackHandler;
+
 // Prototipos 
 Stack *newStack (void);				//Declara la stack
-void destroy(Stack *p);             //Eliminar la Stack
-static int stackSize(Stack *p);                 //Obtener el número de elementos en la Stack
+void stackClear(Stack *p);             //Eliminar la Stack
+void initStackHandler(StackHandler *);
+int stackSize(Stack *p);                 //Obtener el número de elementos en la Stack
 bool stackEmpty(Stack *p);          //Verificar si la Stack está vacía
-bool push(Stack *, element e); //Empilar, introducir un elemento a la Stack
-element pop(Stack *p);             //Desempilar, sacar un elemento de la Stack
-element top(Stack *p);             //Consultar el elemento del tope de la Stack sin sacarlo
+
+bool stackPush(Stack *, element e); //Empilar, introducir un elemento a la Stack
+element stackPop(Stack *p);             //Desempilar, sacar un elemento de la Stack
+element stackTop(Stack *p);             //Consultar el elemento del tope de la Stack sin sacarlo
 
 #endif
 
