@@ -5,6 +5,9 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
+
+typedef long long int lli;
 
 typedef struct rational {
     long a, 

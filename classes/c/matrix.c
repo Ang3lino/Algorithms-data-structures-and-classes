@@ -13,6 +13,7 @@ initMatrixHandler(MatrixHandler *mh) {
     mh->rand = matrixRandom;
     mh->minor = matrixMinor;
     mh->new = newMatrix;
+    mh->inv = matrixInverse;
 
     // Rational *
     mh->det = matrixDeterminant;
@@ -27,11 +28,11 @@ Matrix *
 matrixRandom(int x, int y) {
     int i, j;
     Matrix *a = newMatrix(x, y);
-    //srand(time(NULL));
-    srand(0);
+    srand(time(NULL));
+    //srand(0);
     for (i = 0; i < x; i++) 
         for (j = 0; j < y; j++) {
-            a->mat[i][j]->a = rand() % 10;
+            a->mat[i][j]->a = rand() % 4;
             a->mat[i][j]->b = 1;
         }
     return a;
@@ -249,22 +250,22 @@ addMultRows(Matrix *a, int x, int y, Rational *esc) {
 
 int 
 detPivot(Matrix *a, int x) {
-    int i, j, l = x + 1;
+    int i = x + 1, j;
     Rational *r = newRational(), *minusOne = newRational();
     minusOne->a = -1;
     RationalHandler rh;
     initRationalHandler(&rh);
-    while (a->mat[x][x] == 0 && l < a->n) {
-        swapRows(a, x, l++);
-        matrixPrinter(a);
+    if (a->mat[x][x]->a == 0) {
+        while (a->mat[i++][x]->a == 0 && i < a->m);
+        if (i == a->m) 
+            return 0;
+        swapRows(a, i, x);
     }
-    if (l == a->m)
-        return 0;
-    for (i = x; i < a->m - 1; i++) {
-        if (a->mat[i][x] == 0)
+    for (i = x + 1; i < a->m; i++) {
+        if (a->mat[i][x]->a == 0)
             continue;
-        r = rh.quot(rh.prod(minusOne, a->mat[i + 1][x]), a->mat[i][x]);
-        addMultRows(a, i + 1, i, r);
+        r = rh.quot(rh.prod(minusOne, a->mat[i][x]), a->mat[x][x]);
+        addMultRows(a, i, x, r);
     }
     return 1;
 }
@@ -278,7 +279,7 @@ matrixDeterminant(Matrix *a) {
     Rational *r = newRational();
     RationalHandler rh;
     int i;
-    for (i = 0; i < a->m; i++) {
+    for (i = 0; i < a->m - 1; i++) {
         //matrixPrinter(a);
         if (detPivot(a, i) == 0)
             return r; // r = 0
@@ -288,6 +289,29 @@ matrixDeterminant(Matrix *a) {
     for (i = 0; i < a->m; i++) 
         r = rh.prod(r, a->mat[i][i]);
     return r;
+}
+
+Matrix *
+matrixInverse(Matrix *a) {
+    if (a->m != a->n) {
+        perror("Error at matrixInverse: it's a non-square matrix :O ");
+        exit(-1);
+    }
+    Rational *r = newRational();
+    RationalHandler rh;
+    MatrixHandler mh;
+    initMatrixHandler(&mh);
+    initRationalHandler(&rh);
+    if ((r = mh.det(a))->a == 0) {
+        puts("The matrix has no inverse. ");
+        return NULL;
+    }
+    Matrix *inv = mh.new(a->m, a->n);
+    int i, j;
+    for (i = 0; i < a->m; i++)
+        for (j = 0; j < a->n; j++)
+            inv->mat[i][j] = rh.prod(rh.rec(r), mh.cof(a, i, j));
+    return inv;
 }
 
 /*

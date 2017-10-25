@@ -21,7 +21,7 @@ rationalSimplify(Rational *r) {
 			r->a *= -1;
 			r->b *= -1;
 		}
-		long mcd = gcd(r->a, r->b);
+		long mcd = gcd(abs(r->a), abs(r->b));
 		r->a /= mcd;
 		r->b /= mcd;
 	}
@@ -61,6 +61,7 @@ rationalAdd(Rational *x, Rational *y) {
 	Rational *r = newRational();
 	r->a = x->a * y->b + y->a * x->b;
 	r->b = x->b * y->b;
+	rationalSimplify(r);
 	return r;
 }
 
@@ -82,15 +83,25 @@ rationalProduct(Rational *p, Rational *q) {
 
 Rational *
 rationalQuotient(Rational *p, Rational *q) {
-	Rational *r = newRational();
-	return rationalProduct(p, rationalReciprocal(q));
+	if (q->a == 0) {
+		perror("Arithmetic exception at rationalQuotient : divition by zero D: ");
+		exit(-1);
+	}
+	Rational *r = rationalProduct(p, rationalReciprocal(q));
+	rationalSimplify(r);
+	return r;
 }
 
 Rational *
 rationalReciprocal(Rational *p) {
+	if (p->a == 0) {
+		perror("Arithmetic exception at rationalReciprocal: 1 / 0 D: ");
+		exit(-1);
+	}
 	Rational *r = newRational();
 	r->a = p->b;
 	r->b = p->a;
+	rationalSimplify(r);
 	return r;
 }
 
