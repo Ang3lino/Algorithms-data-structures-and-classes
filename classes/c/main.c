@@ -15,6 +15,8 @@ main (void) {
     mh.print(a);
     b = mh.inv(a);
     mh.print(b);
+    mh.free(a);
+    mh.free(b);
     puts("");
     return 0;
 }

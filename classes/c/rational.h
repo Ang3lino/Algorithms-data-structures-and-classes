@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <stdbool.h>
 
 typedef long long int lli;
 
@@ -20,6 +21,9 @@ typedef struct rationalHandler {
     Rational *(*prod)(Rational *, Rational *);
     Rational *(*quot)(Rational *, Rational *);
     Rational *(*rec)(Rational *);
+    Rational *(*new)(void);
+
+    bool (*compareTo)(Rational *, Rational *);
     
     void (*simp)(Rational *);
     void (*print)(Rational *);
@@ -29,7 +33,7 @@ void initRationalHandler(RationalHandler *);
 void rationalSimplify(Rational *);
 void rationalPrint(Rational *);
 
-Rational *newRational();
+Rational *newRational(void);
 Rational *rationalAdd(Rational *, Rational *);
 Rational *rationalSubtraction(Rational *, Rational *);
 Rational *rationalProduct(Rational *, Rational *);

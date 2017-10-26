@@ -37,6 +37,7 @@ typedef struct matrixHandler
     Rational *(*get)(Matrix *, int, int);
 
     void (*print)(Matrix *);
+    void (*free)(Matrix *);
 } MatrixHandler;
 
 Matrix *newMatrix(int, int);
@@ -56,6 +57,7 @@ Rational *matrixCofactor(Matrix *, int, int);
 Rational *matrixGet(Matrix *, int, int);
 
 void matrixPrinter(Matrix *);
+void matrixFree(Matrix *);
 void initMatrixHandler(MatrixHandler *);
 void swapRows(Matrix *, int , int);
 

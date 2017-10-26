@@ -1,6 +1,8 @@
 
 #include "matrix.h"
 
+// posix pthread threads at c
+
 void 
 initMatrixHandler(MatrixHandler *mh) {
     // Matrix *
@@ -19,9 +21,10 @@ initMatrixHandler(MatrixHandler *mh) {
     mh->det = matrixDeterminant;
     mh->cof = matrixCofactor;
     mh->get = matrixGet;
-    
+
     // void
     mh->print = matrixPrinter;
+    mh->free = matrixFree;
 }
 
 Matrix *
@@ -60,6 +63,15 @@ newMatrix(int x, int y) {
     m->m = x;
     m->n = y;
     return m;
+}
+
+void 
+matrixFree(Matrix *a) {
+    int i, j;
+    for (i = 0; i < a->m; i++)
+        free(a->mat[i][0]);
+    free(a->mat);
+    free(a);
 }
 
 void 
@@ -270,17 +282,17 @@ detPivot(Matrix *a, int x) {
     return 1;
 }
 
+// it modifies the matrix
 Rational *
 matrixDeterminant(Matrix *a) {
     if (a->m != a->n) {
-        perror("No mames, det(A) con A no cuadrada no esta definido. ");
+        perror("error at matrixDeterminant: Matrix for a non-square matrix's undefined. -_-");
         exit(-1);
     }
     Rational *r = newRational();
     RationalHandler rh;
     int i;
     for (i = 0; i < a->m - 1; i++) {
-        //matrixPrinter(a);
         if (detPivot(a, i) == 0)
             return r; // r = 0
     }
@@ -291,6 +303,7 @@ matrixDeterminant(Matrix *a) {
     return r;
 }
 
+/*
 Matrix *
 matrixInverse(Matrix *a) {
     if (a->m != a->n) {
@@ -312,6 +325,61 @@ matrixInverse(Matrix *a) {
         for (j = 0; j < a->n; j++)
             inv->mat[i][j] = rh.prod(rh.rec(r), mh.cof(a, i, j));
     return inv;
+}
+*/ 
+
+static Matrix * 
+inverserHelper(Matrix *a) {
+    Matrix *temp = newMatrix(a->m, a->n * 2);
+    Rational *unit = newRational();
+    unit->a = 1;
+    int i, j;
+    for (i = 0; i < a->m; i++)
+        for (j = 0; j < a->n; j++) 
+            temp->mat[i][j] = matrixGet(a, i, j);
+    j = a->n;
+    for (i = 0; i < a->m; i++)
+        temp->mat[i][j++] = unit;
+    return temp;
+}
+
+static Matrix *
+gaussPivot(Matrix *a, int x) {
+    int i, j;
+    Rational *r = newRational();
+    RationalHandler rh;
+    MatrixHandler mh;
+    r->a = 0;
+    initRationalHandler(&rh);
+    initMatrixHandler(&mh);
+    if (rh.compareTo(r, a->mat[x][x]) == true) {
+
+    }
+
+
+}
+
+// yt cs50
+Matrix * 
+matrixInverse(Matrix *a) {
+    if (a->m != a->n) {
+        perror("Error at matrixInverse: it's a non-square matrix :O ");
+        exit(-1);
+    }
+    MatrixHandler mh;
+    RationalHandler rh;
+    initMatrixHandler(&mh);
+    initRationalHandler(&rh);
+    /*
+    if (mh.det(a)->a == 0) {
+        perror("The given matrix has no inverse D: ");
+        return NULL;
+    }
+    */
+    Matrix *temp = inverserHelper(a);
+    int i, j;
+    Rational *r = rh.new();
+    return temp;
 }
 
 /*

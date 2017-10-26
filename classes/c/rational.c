@@ -1,6 +1,8 @@
 
 #include "rational.h"
 
+// hilos petry linux hilos
+
 long 
 gcd(long a, long b){
     long r;
@@ -10,6 +12,13 @@ gcd(long a, long b){
 		b = r;
 	}
     return a;
+}
+
+bool 
+rationalCompareTo(Rational *p, Rational *q) {
+	if (p->a * q->b == q->a * p->b)
+		return true;
+	return false;
 }
 
 void 
@@ -37,11 +46,16 @@ rationalPrint(Rational *r) {
 
 void 
 initRationalHandler(RationalHandler *rh) {
+	// Rational *
 	rh->add = rationalAdd;
 	rh->sub = rationalSubtraction;
 	rh->prod = rationalProduct;
 	rh->quot = rationalQuotient;
 	rh->rec = rationalReciprocal;
+	rh->new = newRational;
+
+	// bool
+	rh->compareTo = rationalCompareTo;
 
 	//void 
 	rh->simp = rationalSimplify;
