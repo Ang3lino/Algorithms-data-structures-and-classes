@@ -27,6 +27,11 @@ typedef struct rationalHandler {
     
     void (*simp)(Rational *);
     void (*print)(Rational *);
+
+    Rational one, 
+             zero, 
+             minusOne;
+
 } RationalHandler;
 
 void initRationalHandler(RationalHandler *);

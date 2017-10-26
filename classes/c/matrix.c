@@ -247,7 +247,7 @@ subtractRows(Matrix *a, int p, int q) {
     RationalHandler rh;
     initRationalHandler(&rh);
     for (j = 0; j < a->n; j++)
-        a->mat[q][j] = rh.sub(a->mat[p][j], a->mat[q][j]);
+        a->mat[p][j] = rh.sub(a->mat[p][j], a->mat[q][j]);
 }
 
 // rx <- rx + a ry
@@ -343,20 +343,32 @@ inverserHelper(Matrix *a) {
     return temp;
 }
 
-static Matrix *
+static bool
 gaussPivot(Matrix *a, int x) {
-    int i, j;
-    Rational *r = newRational();
+    int i = x;
     RationalHandler rh;
     MatrixHandler mh;
-    r->a = 0;
     initRationalHandler(&rh);
-    initMatrixHandler(&mh);
-    if (rh.compareTo(r, a->mat[x][x]) == true) {
-
+    initMatrixHandler(&mh); 
+    while (rh.compareTo(&rh.zero, a->mat[i][x]) && i < a->m)
+        i++;
+    if (i == a->m)
+        return false;
+    swapRows(a, x, i);
+    for (i = 0; i < a->m; i++) {
+        if (rh.compareTo(mh.get(a, i, x), &rh.zero) || rh.compareTo(mh.get(a, i, x), &rh.one))
+            continue;
+        multRow(a, i, rh.rec(mh.get(a, i, x)));
     }
-
-
+    for (i = 0; i < a->m; i++) {
+        if (i == x || rh.compareTo(mh.get(a, i, x), &rh.zero))
+            continue;        
+        subtractRows(a, i, x);
+    }
+    for (i = 0; i < a->m; i++) 
+        if (!rh.compareTo(mh.get(a, i, i), &rh.one))
+            multRow(a, i, rh.rec(mh.get(a, i, i)));
+    return true;
 }
 
 // yt cs50
@@ -378,7 +390,9 @@ matrixInverse(Matrix *a) {
     */
     Matrix *temp = inverserHelper(a);
     int i, j;
-    Rational *r = rh.new();
+    for (i = 0; i < temp->m; i++)
+        if (!gaussPivot(temp, i))
+            return NULL;
     return temp;
 }
 

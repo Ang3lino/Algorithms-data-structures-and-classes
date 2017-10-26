@@ -60,6 +60,13 @@ initRationalHandler(RationalHandler *rh) {
 	//void 
 	rh->simp = rationalSimplify;
 	rh->print = rationalPrint;
+
+	rh->one.a = 1;
+	rh->one.b = 1;
+	rh->zero.a = 0;
+	rh->zero.b = 1;
+	rh->minusOne.a = -1;
+	rh->minusOne.b = 1;
 }
 
 Rational *
