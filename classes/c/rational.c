@@ -26,7 +26,7 @@ rationalSimplify(Rational *r) {
 	if (r->a == 0) 
 		r->b = 1;
 	else {
-		if ((r->a < 0 && r->b < 0) || (r->a >= 0 && r->b < 0)) {
+		if (r->a < 0 && r->b < 0) {
 			r->a *= -1;
 			r->b *= -1;
 		} 
@@ -39,9 +39,9 @@ rationalSimplify(Rational *r) {
 void 
 rationalPrint(Rational *r) {
 	if (r->b == 1) 
-		printf("%ld", r->a);
+		printf("%lld", r->a);
 	else
-		printf("%ld/%ld", r->a, r->b);
+		printf("%lld/%lld", r->a, r->b);
 }
 
 void 
@@ -57,10 +57,11 @@ initRationalHandler(RationalHandler *rh) {
 	// bool
 	rh->compareTo = rationalCompareTo;
 
-	//void 
+	// void 
 	rh->simp = rationalSimplify;
 	rh->print = rationalPrint;
 
+	// constants
 	rh->one.a = 1;
 	rh->one.b = 1;
 	rh->zero.a = 0;

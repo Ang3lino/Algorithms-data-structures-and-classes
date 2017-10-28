@@ -21,16 +21,17 @@ typedef struct matrix {
 
 typedef struct matrixHandler 
 {
-    Matrix *(*new)(int, int);
-    Matrix *(*add)(Matrix *, Matrix *);
-    Matrix *(*prod)(Matrix *, Matrix *);
-    Matrix *(*subt)(Matrix *, Matrix *);
-    Matrix *(*trans)(Matrix *);
-    Matrix *(*adj)(Matrix *);
-    Matrix *(*escProd)(Matrix *, Rational *);
-    Matrix *(*rand)(int, int);
-    Matrix *(*minor)(Matrix *, int, int);
-    Matrix *(*inv)(Matrix *);
+    Matrix *(*new)(int, int),
+        *(*add)(Matrix *, Matrix *),
+        *(*prod)(Matrix *, Matrix *),
+        *(*subt)(Matrix *, Matrix *),
+        *(*trans)(Matrix *),
+        *(*adj)(Matrix *),
+        *(*escProd)(Matrix *, Rational *),
+        *(*rand)(int, int),
+        *(*minor)(Matrix *, int, int),
+        *(*inv)(Matrix *),
+        *(*clone)(Matrix *);
 
     Rational *(*det)(Matrix *);
     Rational *(*cof)(Matrix *, int, int);
@@ -51,6 +52,7 @@ Matrix *matrixTransposed(Matrix *);
 Matrix *matrixAdjunct(Matrix *);
 Matrix *matrixEscalarProduct(Matrix *, Rational *);
 Matrix *matrixInverse(Matrix *);
+Matrix *matrixClone(Matrix *);
 
 Rational *matrixDeterminant(Matrix *);
 Rational *matrixCofactor(Matrix *, int, int);

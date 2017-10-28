@@ -16,6 +16,7 @@ initMatrixHandler(MatrixHandler *mh) {
     mh->minor = matrixMinor;
     mh->new = newMatrix;
     mh->inv = matrixInverse;
+    mh->clone = matrixClone;
 
     // Rational *
     mh->det = matrixDeterminant;
@@ -67,7 +68,7 @@ newMatrix(int x, int y) {
 
 void 
 matrixFree(Matrix *a) {
-    int i, j;
+    int i;
     for (i = 0; i < a->m; i++)
         free(a->mat[i][0]);
     free(a->mat);
@@ -80,9 +81,9 @@ matrixPrinter(Matrix *a) {
     for (i = 0; i < a->m; i++) {
         for (j = 0; j < a->n; j++) {
             if (a->mat[i][j]->b == 1)
-                printf ("%ld\t", a->mat[i][j]->a);
+                printf ("%lld\t", a->mat[i][j]->a);
             else  
-                printf("%ld/%ld\t", a->mat[i][j]->a, a->mat[i][j]->b);
+                printf("%lld/%lld\t", a->mat[i][j]->a, a->mat[i][j]->b);
         }
         printf("\n");
     }
@@ -267,7 +268,8 @@ detPivot(Matrix *a, int x) {
     RationalHandler rh;
     initRationalHandler(&rh);
     if (a->mat[x][x]->a == 0) {
-        while (a->mat[i++][x]->a == 0 && i < a->m);
+        while (i < a->m && a->mat[i][x]->a == 0) 
+            i++;
         if (i == a->m) 
             return 0;
         swapRows(a, i, x);
@@ -281,16 +283,29 @@ detPivot(Matrix *a, int x) {
     return 1;
 }
 
-// it modifies the matrix
+Matrix *
+matrixClone(Matrix *a) {
+    int i, j;
+    MatrixHandler mh;
+    initMatrixHandler(&mh);
+    Matrix *c = mh.new(a->m, a->n);
+    for (i = 0; i < a->m; i++)
+        for (j = 0; j < a->n; j++)
+            c->mat[i][j] = mh.get(a, i, j);
+    return c;
+}
+
+// sign error sometimes...
 Rational *
-matrixDeterminant(Matrix *a) {
-    if (a->m != a->n) {
+matrixDeterminant(Matrix *b) {
+    if (b->m != b->n) {
         perror("error at matrixDeterminant: Matrix for a non-square matrix's undefined. -_-");
         exit(-1);
     }
     Rational *r = newRational();
     RationalHandler rh;
     int i;
+    Matrix *a = matrixClone(b);
     for (i = 0; i < a->m - 1; i++) {
         if (detPivot(a, i) == 0)
             return r; // r = 0
