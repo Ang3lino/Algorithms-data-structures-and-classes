@@ -11,7 +11,7 @@
 typedef long long int lli;
 
 typedef struct rational {
-    long a, 
+    lli a, 
          b;
 } Rational;
 
@@ -45,8 +45,7 @@ Rational *rationalProduct(Rational *, Rational *);
 Rational *rationalQuotient(Rational *, Rational *);
 Rational *rationalReciprocal(Rational *);
 
-
-long gdc(long, long);
+lli gdc(lli, lli);
 
 
 #endif 

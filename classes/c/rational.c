@@ -3,12 +3,12 @@
 
 // hilos petry linux hilos
 
-long 
-gcd(long a, long b){
-    long r;
+lli 
+gcd(lli a, lli b){
+    lli r;
     while(b != 0) {
 		r = a % b;
-		 a = b; 
+		a = b; 
 		b = r;
 	}
     return a;
@@ -26,11 +26,11 @@ rationalSimplify(Rational *r) {
 	if (r->a == 0) 
 		r->b = 1;
 	else {
-		if (r->a < 0 && r->b < 0) {
+		if ((r->a < 0 && r->b < 0) || (r->a >= 0 && r->b < 0)) {
 			r->a *= -1;
 			r->b *= -1;
-		}
-		long mcd = gcd(abs(r->a), abs(r->b));
+		} 
+		lli mcd = gcd(abs(r->a), abs(r->b));
 		r->a /= mcd;
 		r->b /= mcd;
 	}

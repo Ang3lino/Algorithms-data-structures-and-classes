@@ -35,7 +35,7 @@ matrixRandom(int x, int y) {
     //srand(0);
     for (i = 0; i < x; i++) 
         for (j = 0; j < y; j++) {
-            a->mat[i][j]->a = rand() % 4;
+            a->mat[i][j]->a = rand() % 10;
             a->mat[i][j]->b = 1;
         }
     return a;
@@ -349,11 +349,8 @@ aumentedCutter(Matrix *aum) {
     Matrix *dism = mh.new(aum->m, aum->m);
     int i, j;
     for (i = 0; i < aum->m; i++) 
-        for (j = aum->m; j < 2 * aum->m; j++) {
-            mh.print(aum);
-            mh.print(dism);
-            dism->mat[i][j - aum->n] = mh.get(aum, i, j);
-        }
+        for (j = aum->m; j < 2 * aum->m; j++) 
+            dism->mat[i][j - aum->m] = mh.get(aum, i, j);
     return dism;
 }
 

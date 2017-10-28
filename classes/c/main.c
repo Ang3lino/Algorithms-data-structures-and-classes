@@ -1,6 +1,6 @@
 
 #include "matrix.h"
-#define ord 5
+#define ord 10
 
 MatrixHandler mh;
 RationalHandler rh;
