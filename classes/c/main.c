@@ -1,6 +1,6 @@
 
 #include "matrix.h"
-#define ord 3
+#define ord 5
 
 MatrixHandler mh;
 RationalHandler rh;
@@ -15,7 +15,8 @@ main (void) {
 
     mh.print(a);
     b = mh.inv(a);
-    mh.print(b);
+    if (b)
+        mh.print(b);
    // mh.free(a);
     //mh.free(b);
     puts("");

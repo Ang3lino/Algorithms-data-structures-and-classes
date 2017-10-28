@@ -240,7 +240,6 @@ addRows(Matrix *a, int p, int q) {
         a->mat[q][j] = rh.add(a->mat[p][j], a->mat[q][j]);
 }
 
-// warning, it's not a elementary row operation
 void 
 subtractRows(Matrix *a, int p, int q) {
     int j;
@@ -343,31 +342,42 @@ inverserHelper(Matrix *a) {
     return temp;
 }
 
+Matrix *
+aumentedCutter(Matrix *aum) {
+    MatrixHandler mh;
+    initMatrixHandler(&mh);
+    Matrix *dism = mh.new(aum->m, aum->m);
+    int i, j;
+    for (i = 0; i < aum->m; i++) 
+        for (j = aum->m; j < 2 * aum->m; j++) {
+            mh.print(aum);
+            mh.print(dism);
+            dism->mat[i][j - aum->n] = mh.get(aum, i, j);
+        }
+    return dism;
+}
+
 static bool
-gaussPivot(Matrix *a, int x) {
-    int i = x;
+gaussPivot(Matrix *a, const int x) {
+    int i = x + 1;
     RationalHandler rh;
     MatrixHandler mh;
     initRationalHandler(&rh);
     initMatrixHandler(&mh); 
-    while (rh.compareTo(&rh.zero, a->mat[i][x]) && i < a->m)
-        i++;
-    if (i == a->m)
-        return false;
-    swapRows(a, x, i);
-    for (i = 0; i < a->m; i++) {
-        if (rh.compareTo(mh.get(a, i, x), &rh.zero) || rh.compareTo(mh.get(a, i, x), &rh.one))
-            continue;
-        multRow(a, i, rh.rec(mh.get(a, i, x)));
+    if (rh.compareTo(&rh.zero, mh.get(a, x, x))){
+        while (i < a->m && rh.compareTo(&rh.zero, a->mat[i][x]))
+            i++;
+        if (i == a->m)
+            return false;
+        swapRows(a, x, i);
     }
+    if (!rh.compareTo(mh.get(a, x, x), &rh.one))
+        multRow(a, x, rh.rec(mh.get(a, x, x)));
     for (i = 0; i < a->m; i++) {
         if (i == x || rh.compareTo(mh.get(a, i, x), &rh.zero))
             continue;        
-        subtractRows(a, i, x);
+        addMultRows(a, i, x, rh.prod(mh.get(a, i, x), &rh.minusOne));
     }
-    for (i = 0; i < a->m; i++) 
-        if (!rh.compareTo(mh.get(a, i, i), &rh.one))
-            multRow(a, i, rh.rec(mh.get(a, i, i)));
     return true;
 }
 
@@ -382,18 +392,20 @@ matrixInverse(Matrix *a) {
     RationalHandler rh;
     initMatrixHandler(&mh);
     initRationalHandler(&rh);
-    /*
-    if (mh.det(a)->a == 0) {
-        perror("The given matrix has no inverse D: ");
-        return NULL;
-    }
-    */
     Matrix *temp = inverserHelper(a);
     int i, j;
-    for (i = 0; i < temp->m; i++)
-        if (!gaussPivot(temp, i))
+    for (i = 0; i < temp->m; i++) {
+        //mh.print(temp);
+        if (!gaussPivot(temp, i)) {
+            puts("The matrix given isn't invertible D: ");
             return NULL;
-    return temp;
+        }
+    } 
+    for (i = 0; i < temp->m; i++) 
+        if (!rh.compareTo(mh.get(temp, i, i), &rh.one))
+            multRow(temp, i, rh.rec(mh.get(temp, i, i)));
+    Matrix *dism = aumentedCutter(temp);
+    return dism;
 }
 
 /*
