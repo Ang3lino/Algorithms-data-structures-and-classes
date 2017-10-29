@@ -14,6 +14,17 @@ gcd(lli a, lli b){
     return a;
 }
 
+char * 
+rationalAsString(Rational *r) {
+	int i, slen = 2, rlen;
+	char *s = (char *) calloc (sizeof(char), 42);
+	if (r->b == 1) 
+		sprintf(s, "%lld", r->a);
+	else
+		sprintf(s, "%lld/%lld", r->a, r->b);
+	return s;	
+}
+
 bool 
 rationalCompareTo(Rational *p, Rational *q) {
 	if (p->a * q->b == q->a * p->b)
@@ -60,6 +71,9 @@ initRationalHandler(RationalHandler *rh) {
 	// void 
 	rh->simp = rationalSimplify;
 	rh->print = rationalPrint;
+
+	// char *
+	rh->asString = rationalAsString;
 
 	// constants
 	rh->one.a = 1;

@@ -12,16 +12,18 @@ typedef long long int lli;
 
 typedef struct rational {
     lli a, 
-         b;
+        b;
 } Rational;
 
 typedef struct rationalHandler {
-    Rational *(*add)(Rational *, Rational *);
-    Rational *(*sub)(Rational *, Rational *);
-    Rational *(*prod)(Rational *, Rational *);
-    Rational *(*quot)(Rational *, Rational *);
-    Rational *(*rec)(Rational *);
-    Rational *(*new)(void);
+    Rational *(*add)(Rational *, Rational *),
+        *(*sub)(Rational *, Rational *),
+        *(*prod)(Rational *, Rational *),
+        *(*quot)(Rational *, Rational *),
+        *(*rec)(Rational *),
+        *(*new)(void);
+
+    char *(*asString)(Rational *);
 
     bool (*compareTo)(Rational *, Rational *);
     
@@ -37,6 +39,8 @@ typedef struct rationalHandler {
 void initRationalHandler(RationalHandler *);
 void rationalSimplify(Rational *);
 void rationalPrint(Rational *);
+
+char *rationalAsString(Rational *);
 
 Rational *newRational(void);
 Rational *rationalAdd(Rational *, Rational *);

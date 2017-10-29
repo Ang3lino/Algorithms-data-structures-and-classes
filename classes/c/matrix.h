@@ -33,12 +33,12 @@ typedef struct matrixHandler
         *(*inv)(Matrix *),
         *(*clone)(Matrix *);
 
-    Rational *(*det)(Matrix *);
-    Rational *(*cof)(Matrix *, int, int);
-    Rational *(*get)(Matrix *, int, int);
+    Rational *(*det)(Matrix *),
+        *(*cof)(Matrix *, int, int),
+        *(*get)(Matrix *, int, int);
 
-    void (*print)(Matrix *);
-    void (*free)(Matrix *);
+    void (*print)(Matrix *),
+        (*free)(Matrix *);
 } MatrixHandler;
 
 Matrix *newMatrix(int, int);

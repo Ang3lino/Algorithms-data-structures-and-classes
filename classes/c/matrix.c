@@ -118,9 +118,8 @@ matrixProduct(Matrix *a, Matrix *b) {
         initRationalHandler(&rh);
         for (i = 0; i < a->m; i++) 
             for (j = 0; j < b->n; j++) {
-                c->mat[i][j]->a = 0;
                 for (k = 0; k < b->n; k++) 
-                    c->mat[i][j] = rh.prod(a->mat[i][k], b->mat[k][j]);
+                    c->mat[i][j] = rh.add(c->mat[i][j], rh.prod(a->mat[i][k], b->mat[k][j]));
             }
     } else {
         perror("The product's undefined \n");
@@ -407,7 +406,6 @@ matrixInverse(Matrix *a) {
     Matrix *temp = inverserHelper(a);
     int i, j;
     for (i = 0; i < temp->m; i++) {
-        //mh.print(temp);
         if (!gaussPivot(temp, i)) {
             puts("The matrix given isn't invertible D: ");
             return NULL;
