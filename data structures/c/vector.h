@@ -1,4 +1,3 @@
-
 #ifndef VECTOR_H
 #define VECTOR_H
 
@@ -12,22 +11,22 @@
 typedef struct vector {
     void **item;
     size_t size;
-    size_t capacity;
-} Vector;
+    size_t capacity; // private
+} vector;
 
-typedef void *T; // Emulacion generica
+// typedef void *T; // Emulacion generica
 
-Vector *newVector (void);
-T vectorPopBack (Vector *);
-T vectorPopFront (Vector *);
+vector *new_vector (void);
 
-void vectorResize (Vector *, size_t);
-void vectorPushBack (Vector *, void *);
-void vectorPushFront (Vector *, void *);
-void vectorClear (Vector *);
-void vectorResize (Vector *, size_t);
-void vectorAdd (Vector *, size_t, void *);
-void vectorSet (Vector *, size_t, void *);
+void *vpop_back (vector *);
+void *vpop_front (vector *);
+
+void vresize (vector *, size_t);
+void vpush_back (vector *, void *);
+void vpush_front (vector *, void *);
+void vclear (vector *);
+void vresize (vector *, size_t);
+void vadd (vector *, size_t, void *);
+void vset (vector *, size_t, void *);
 
 #endif
-
