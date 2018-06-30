@@ -105,17 +105,18 @@ void treesort(vector<int> &v) {
 }
 
 void test() {
-    vector<int> v = { 3, 8, 0, 7, 4, 5 };
+    //vector<int> v = { 3, 8, 0, 7, 4, 5 };
+    vector<int> v = read_from_file("10millones.txt", 1e4);
     bst<int> tree(v);
 
     cout << "antes: " << endl;
-    tree.inorder();
-    cout << "Numero de nodos: " << tree.numberOfNodes() << endl;
+    //tree.inorder();
+    cout << "\nNumero de nodos: " << tree.numberOfNodes() << endl;
 
     for (int x: v) {
-        cout << x << ", ";
+        cout << "\nElemento actual: " << x << endl;
         tree.remove(x);
-        tree.inorder();
+        //tree.inorder();
         cout << endl;
     }
     cout << "despues: " << endl;

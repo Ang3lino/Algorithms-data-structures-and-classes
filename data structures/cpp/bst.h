@@ -65,19 +65,6 @@ private:
         return root;
     }
 
-    void remove(BinaryNode *&self, const T &x) {
-        if (self == nullptr) return; // no encontrado
-        if (x < self->data) remove(self->left, x);
-        else if (self->data < x) remove(self->right, x);
-        else if (self->left != nullptr && self->right != nullptr) { // dos hijos
-            self->data = min(self->right)->data;
-            remove(self->right, self->data); // removemos el sucesor duplicado
-        } else { // el nodo tiene a lo mas 1 hijo
-            BinaryNode *old = self; // guardamos la direccion del nodo a ser borrado
-            self = (self->left != nullptr) ? self->left: self->right;
-            delete old;
-        }
-    }
 
     inline bool leaf(BinaryNode *node) {
         return node->right == nullptr && node->left == nullptr;
@@ -88,7 +75,39 @@ private:
         return numberOfNodes(root->left) + numberOfNodes(root->right) + 1;
     }
 
+    void remove(BinaryNode *&self, BinaryNode *parent, const T &x) {
+        if (self == nullptr) return; // no encontrado
+        if (x < self->data) remove(self->left, self, x);
+        else if (self->data < x) remove(self->right, self, x);
+        else if (self->left != nullptr && self->right != nullptr) { // dos hijos
+            self->data = min(self->right)->data;
+            remove(self->right, self, self->data); // eliminamos el sucesor duplicado
+        } else { // el nodo tiene a lo mas 1 hijo
+            BinaryNode *old = self; // guardamos la direccion del nodo a ser borrado
+            self = (self->left != nullptr) ? self->left: self->right;
+            if (self != nullptr) self->parent = parent;
+            delete old;
+        }
+    }
+
+    void destroy(BinaryNode *&root) {
+        if (root != nullptr) {
+            destroy(root->left);
+            destroy(root->right);
+            delete root;
+        }
+        root = nullptr;
+    }
+
 public:
+
+    inline void remove(T x) {
+        remove(root, nullptr, x);
+    }
+
+    inline ~bst() { 
+        destroy(root);
+    }
 
     inline bst() { root = nullptr; } 
 
@@ -102,9 +121,6 @@ public:
         return numberOfNodes(root);
     }
 
-    inline void remove(T x) {
-        remove(root, x);
-    }
 
     inline void add(T data) { 
         root = add(root, data); // actualizamos la nueva raiz 
