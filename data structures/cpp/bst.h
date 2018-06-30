@@ -71,7 +71,7 @@ private:
         else if (self->data < x) remove(self->right, x);
         else if (self->left != nullptr && self->right != nullptr) { // dos hijos
             self->data = min(self->right)->data;
-            remove(self->right, x);
+            remove(self->right, self->data); // removemos el sucesor duplicado
         } else { // el nodo tiene a lo mas 1 hijo
             BinaryNode *old = self; // guardamos la direccion del nodo a ser borrado
             self = (self->left != nullptr) ? self->left: self->right;
