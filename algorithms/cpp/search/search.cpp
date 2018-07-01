@@ -13,7 +13,7 @@ vector<int> read_from_file(const char * path, const int n) {
     vector<int> loaded;
     ifstream stream(path); // flujo de entrada
     int temp, i = 0;
-    assert(stream.is_open());
+    //assert(stream.is_open());
     while (i < n && stream >> temp) {
         loaded.push_back(temp);
         i++;
@@ -62,23 +62,37 @@ void lineartest() {
     cout << linear_search(v, 1226985352) << endl;
 }
 
-inline bool binary_search(const vector<int> &v, const int findable) {
-    return bin_search(v, findable, 0, v.size() - 1);
-} 
-    
+/**
+ * Determina si x pertenece a un vector ordenado.
+ * Para calcular la mitad del rango es mejor calcular l+(r-l)/2 a comparacion de (l+r)/2
+ * ya que l+r puede albergar un entero muy grande.
+ */
 bool bin_search(const vector<int> &v, const int x, int left, int right) {
     if (left > right) return false;
-    int i = (right - left) / 2;
+    int i = left + (right - left) / 2; 
     if (v[i] == x) return true;
-    if (x < v[i]) return bin_search(v, x, left, right - i); 
-    else return bin_search(v, x, left + i, right); 
+    if (x < v[i]) return bin_search(v, x, left, --i); 
+    return bin_search(v, x, ++i, right); 
 }
 
+inline bool binary_search(const vector<int> &v, const int findable) {
+    int r = v.size() - 1;
+    return bin_search(v, findable, 0, r);
+} 
+
 int main(int argc, char const *argv[]) {
-    vector<int> v = read_from_file("10millones.txt", 1e4);
-    bst<int> tree;
-    tree.sort(v);
-    tree.inorder();
+    vector<int> v = read_from_file("10e3sorted.txt", 1e7);
+    //vector<int> v = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+    for (int x: v) 
+        cout << ((binary_search(v, x)) ? "found": "not found") << endl;
+    cout << ((binary_search(v, 12)) ? "found": "not found") << endl;
+    cout << ((binary_search(v, -1)) ? "found": "not found") << endl;
     return 0;
 }
     //create_subfile("10millones.txt", "10e3.txt", 10e3);
+    /*
+    vector<int> v = read_from_file("10millones.txt", 1e7);
+    bst<int> tree;
+    tree.sort(v);
+    tree.inorder();
+    */
