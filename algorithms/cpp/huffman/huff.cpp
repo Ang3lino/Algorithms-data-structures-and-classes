@@ -30,14 +30,13 @@ vector<int> read_from_file(const char * path, const int n) {
 }
 
 void heapsort_test() {
-    vector<int> v = read_from_file("10e3.txt", 1e4); 
+    vector<int> v = read_from_file("10e3.txt", 1e3); 
     //vector<int> v = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 	MinHeap<int> heap;
 	vector<int> w = MinHeap<int>::sort(v);
 	for (auto x: w)
 		cout << x << endl;
 }
-
 map<u_char, uint> count_frequences(const u_char *source) {
     map<u_char, uint> mfreq;
     for (int i = 0; i < FLEN; i++)
@@ -47,27 +46,45 @@ map<u_char, uint> count_frequences(const u_char *source) {
     return mfreq; 
 }
 
-HuffNode *build_huffman_tree(const map<u_char, uint> mfreq) {
-    MinHeap<HuffNode *> heap;
-    int n = mfreq.size();
-    for (auto x: mfreq) {
-        heap.add(new HuffNode(x.first, x.second));
+void find_codes(HuffNode *node, string walk, map<u_char, string> &table) {
+    if (node->leaf()) 
+        table[node->c] = walk;
+    else {
+        find_codes(node->left, walk + "0", table);
+        find_codes(node->right, walk + "1", table);
     }
-    for (int i = 0; i < n - 1; i++) {
-        HuffNode *z = new HuffNode();
-        z->left = heap.pop();
-        z->right = heap.pop();
-        z->freq = z->left->freq + z->right->freq;
-        heap.add(z);
-    }
-    HuffNode *x = heap.pop();
-    return x;
 }
 
 template<typename K, typename V>
 void print_map(const map<K, V> mfreq) {
     for (auto x: mfreq) 
         cout << "key: " << x.first << " value: " << x.second << "\n";
+}
+
+/** Funcion que retorna la raiz del arbol Huffman.
+ * observaciones:
+ *  Se debe reservar memoria en el heap en las ramas del nodo z, de no ser asi seran 
+ * eliminadas en la siguiente vuelta del bucle, al conectar estas ramas tambien hay que 
+ * pasarles el apuntador a sus hijos.
+ *  La sobrecarga de operadores definida sobre un tipo no funciona apropiadamente cuando
+ * una clase o estructura parametrizada hace uso de este. 
+ */    
+HuffNode build_huffman_tree(const map<u_char, uint> mfreq) {
+    MinHeap<HuffNode> heap;
+    int n = mfreq.size();
+    for (auto x: mfreq) 
+        heap.add(HuffNode(x.first, x.second)); // construimos el heap
+    for (int i = 0; i < n - 1; i++) { // memoria del puntero del ultimo z de sus hijos borrada! error
+        HuffNode x, y, z;
+        x = heap.pop();
+        z.left = new HuffNode(x.c, x.freq, x.left, x.right); // importante reservar memoria en el heap
+        y = heap.pop();
+        z.right = new HuffNode(y.c, y.freq, y.left, y.right);
+        z.freq = x.freq + y.freq;
+        heap.add(z);
+    }
+    HuffNode x = heap.pop();
+    return x;
 }
 
 u_char *parse_file(const char *path) {
@@ -90,33 +107,26 @@ u_char *parse_file(const char *path) {
     return original;
 }
 
-void find_codes(HuffNode *node, string walk, map<u_char, string> &table) {
-    if (node->leaf()) 
-        table[node->c] = walk;
-    else {
-        find_codes(node->left, walk + "0", table);
-        find_codes(node->right, walk + "1", table);
-    }
-}
 
 void encode_file(const char *path) {
     u_char *original = parse_file(path); 
     map<u_char, uint> freq_chars = count_frequences(original);
-    HuffNode *tree = build_huffman_tree(freq_chars);
 
     cout << "Frecuencias del archivo original" << endl;
     print_map(freq_chars);    
+    HuffNode tree = build_huffman_tree(freq_chars);
 
     map<u_char, string> compressed;
-    find_codes(tree, "", compressed);
+    find_codes(&tree, "", compressed);
     cout << "\nFrecuencias del archivo comprimido" << endl;
     print_map(compressed);    
 }
 
 int main(int argc, char const *argv[]) {
-    string path = "10e3.txt";
+    string path = "text.txt";
     //string path = "cpp/huffman/text.txt";
     encode_file(path.c_str());
+    //heapsort_test();
 
     cout << endl;
     return 0;

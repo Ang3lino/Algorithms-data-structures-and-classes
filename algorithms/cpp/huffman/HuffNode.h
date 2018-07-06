@@ -14,10 +14,12 @@ struct HuffNode {
     uint freq;
     u_char c; // caracter
 
+    HuffNode(): c(0), left {nullptr}, right{nullptr}, freq(0) {  }
     HuffNode(u_char character): c(character), left {nullptr}, right{nullptr}, freq(0) {  }
     HuffNode(u_char character, uint frequency): c(character), 
             left {nullptr}, right{nullptr}, freq(frequency) {  }
-    HuffNode(): c(0), left {nullptr}, right{nullptr}, freq(0) {  }
+    HuffNode(u_char character, uint frequency, HuffNode *l, HuffNode *r): 
+        c(character), left {l}, right{r}, freq(frequency) {  }
 
     HuffNode(map<u_char, uint> mfreq): c(0), left {nullptr}, right{nullptr}, freq(0) { 
         HuffNode *root = new HuffNode();
