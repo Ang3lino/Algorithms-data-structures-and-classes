@@ -14,10 +14,13 @@
 #include "MinHeap.h"
 #include "HuffNode.h"
 
+#define TWO_RAISED_TO_SEVEN 128
+
 using namespace std;
 
-uint FLEN = 0; // almacenara la cantidad de caracteres del archivo
-const char *BINARY_EXTENSION = "bin";
+size_t FLEN = 0; // almacenara la cantidad de caracteres del archivo
+const char *TREE_EXTENSION = "bin";
+const char *ENCODED_EXTENSION = "encoded";
 const char NULL_SYMBOL = '$';
 
 /*
@@ -111,14 +114,22 @@ FILE *fopen_ok(const char *name, const char *mode) {
     return fp;
 }
 
+/** retorna la cantidad de bytes contenidas en un archivo */
+size_t file_len(FILE *fp) {
+    int length;
+
+    // obtenemos la cantidad de caracteres del archivo
+	fseek(fp, 0, SEEK_END); // colocamos el puntero al final del archivo
+	length = ftell(fp); // obtenemos la pos actual del cursero
+	rewind(fp); // colocamos el puntero al principio del archivo
+    return length;
+}
+
 u_char *file_to_u_char_ptr(const char *path) {
     FILE *src = fopen_ok(path, "rb"); // lectura en binario de src (file pointer)
 	u_char *original;
-    // obtenemos la cantidad de caracteres del archivo
-	fseek(src, 0, SEEK_END); // colocamos el puntero al final del archivo
-	FLEN = ftell(src); // obtenemos la pos actual del cursero
-	rewind(src); // colocamos el puntero al principio del archivo
 
+	FLEN = file_len(src); // obtenemos la pos actual del cursero
     original = (u_char *) malloc(FLEN * sizeof(u_char));
     fread(original, sizeof(u_char), FLEN, src);
 
@@ -126,9 +137,9 @@ u_char *file_to_u_char_ptr(const char *path) {
     return original;
 }
 
-int create_encoded_file(const u_char *original, const char *path, 
-		map<u_char, string> walks) {
-	int bits = 0;
+size_t create_encoded_file(const u_char *original, const char *path, 
+        map<u_char, string> walks) {
+	size_t bits = 0;
 	char new_name[99];
 	u_char *encoded = (u_char *) malloc(FLEN * sizeof(u_char));
 	for (uint i = 0; i < FLEN; i++) {
@@ -137,18 +148,13 @@ int create_encoded_file(const u_char *original, const char *path,
 			(str[j] == '1') ? bit_up(encoded, bits++): bit_down(encoded, bits++);
 	}
 
-	sprintf(new_name, "%s.huff", path);
+	sprintf(new_name, "%s.%s", path, ENCODED_EXTENSION);
 	FILE *fp = fopen_ok(new_name, "wb");
 	fwrite(encoded, sizeof(u_char), ceil(bits / 8), fp);
 
 	free(encoded);
 	fclose(fp);
 	return bits;
-}
-
-int nodes_amount(HuffNode *tree) {
-    if (tree == NULL) return 0;
-    return 1 + nodes_amount(tree->left) + nodes_amount(tree->right);
 }
 
 void preorder_serialize(HuffNode *self, FILE *fp) {
@@ -172,16 +178,19 @@ char *str_extension(const char *str, const char *ext) {
     return ans;
 }
 
-void save_tree(HuffNode *tree, const char *name) {
-    char *new_name = str_extension(name, BINARY_EXTENSION);
+void save_tree(HuffNode *tree, const char *name, const size_t &bits_used) {
+    char *new_name = str_extension(name, TREE_EXTENSION);
     FILE *fp = fopen_ok(new_name, "wb");
+
+    cout << "\nbits usados: " << bits_used << endl;
+    fprintf(fp, "%zu ", bits_used); // importante el espacio en "%zu "
     preorder_serialize(tree, fp);
     fclose(fp);
     free(new_name);
 }
 
-int encode_file(const char *path) {
-	int bits = 0;
+size_t encode_file(const char *path) {
+	size_t bits = 0;
     u_char *original = file_to_u_char_ptr(path); 
 
     map<u_char, uint> freq_chars = count_frequences(original);
@@ -194,9 +203,8 @@ int encode_file(const char *path) {
     find_codes(&tree, "", walks);
     //cout << "\nFrecuencias del archivo comprimido" << endl;
     //print_map(walks);    
-
 	bits = create_encoded_file(original, path, walks);
-    save_tree(&tree, path);
+    save_tree(&tree, path, bits);
     print_tree(&tree);
 	return bits;
 }
@@ -211,20 +219,59 @@ void rebuild_tree(FILE *fp, HuffNode *&tree) {
     }
 }
 
-HuffNode *get_tree_from_bin(const char *path) {
-    char *new_name = str_extension(path, BINARY_EXTENSION);
+HuffNode *get_tree_from_bin(const char *path, size_t &bits_used) {
+    char *new_name = str_extension(path, TREE_EXTENSION);
     FILE *fp = fopen_ok(new_name, "rb");
     HuffNode *tree;
+    fscanf(fp, "%zu ", &bits_used);
     rebuild_tree(fp, tree);
     return tree;
+}
+
+u_char *get_decoded_stream(HuffNode *root, const u_char *source, const size_t bits) {
+    int bytes = ceil(bits / 8);
+    short bits_to_read;
+    u_char *stream = (u_char *) malloc(sizeof(u_char) * bytes);
+    HuffNode *node = root;
+    size_t used_symbols = 0;
+    for (int i = 0; i < bytes; i++) {
+        bits_to_read = 8;
+        if (i == bytes - 1) bits_to_read = bits % 8;
+        for (int j = 0; j < bits_to_read; j++) {
+            if (source[i] & TWO_RAISED_TO_SEVEN >> j) node = node->right;
+            else node = node->left;
+            if (node->leaf()) {
+                stream[used_symbols++] = node->c;
+                node = root;
+            } 
+        }
+    }
+    return stream;
 }
 
 /** Decofica el archivo.
  *  Se asume que el argumento path tiene el nombre del archivo original (sin .huff o .bin).
  */
 void decode_file(const char *path) {
-    HuffNode *tree = get_tree_from_bin(path);
+    size_t bits_used, bytes_used;
+    HuffNode *tree = get_tree_from_bin(path, bits_used);
+    cout << "\nbits usados: " << bits_used << endl;
     print_tree(tree);
+    bytes_used = ceil(bits_used / 8);
+    u_char *buffer = (u_char *) malloc(sizeof(u_char) * bytes_used);
+
+    FILE *fencoded = fopen_ok(str_extension(path, ENCODED_EXTENSION), "wb");
+    fread(buffer, sizeof(u_char), bytes_used, fencoded);
+    u_char *decoded = get_decoded_stream(tree, buffer, bits_used);
+
+    FILE *fdecoded = fopen_ok("decoded", "wb");
+    fwrite(decoded, sizeof(u_char), bytes_used, fdecoded);
+
+    free(buffer);
+    free(decoded);
+
+    fclose(fencoded);
+    fclose(fdecoded);
 }
 
 int main(int argc, char const *argv[]) {

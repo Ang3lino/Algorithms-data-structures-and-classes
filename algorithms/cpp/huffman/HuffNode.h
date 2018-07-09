@@ -43,11 +43,17 @@ void print_tree (HuffNode *tree, int cont) {
 		print_tree (tree->right, ++cont);
 		for (i = 0; i < cont; i++)
 			printf ("  ");
-        cout << tree->c << endl;
+        if (tree->c == 0) cout << '_' << endl;
+        else cout << tree->c << endl;
 		print_tree (tree->left, ++cont);
 	}
 }
 
 inline void print_tree (HuffNode *tree) { print_tree(tree, 0); }
+
+int nodes_amount(HuffNode *tree) {
+    if (tree == NULL) return 0;
+    return 1 + nodes_amount(tree->left) + nodes_amount(tree->right);
+}
 
 #endif
