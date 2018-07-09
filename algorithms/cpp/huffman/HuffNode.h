@@ -36,5 +36,18 @@ struct HuffNode {
 
 };
 
+void print_tree (HuffNode *tree, int cont) {
+	if (tree == nullptr) return;
+	else {
+		int i;
+		print_tree (tree->right, ++cont);
+		for (i = 0; i < cont; i++)
+			printf ("  ");
+        cout << tree->c << endl;
+		print_tree (tree->left, ++cont);
+	}
+}
+
+inline void print_tree (HuffNode *tree) { print_tree(tree, 0); }
 
 #endif
