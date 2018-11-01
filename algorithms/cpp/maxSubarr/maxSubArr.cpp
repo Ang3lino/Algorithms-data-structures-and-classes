@@ -1,3 +1,4 @@
+// Angel Lopez Manriquez
 
 #include <iostream>
 #include <vector>
@@ -20,7 +21,7 @@ int64_t max_subarr_between(const vector<int64_t> &v, const long l, const long r,
     }
 
     sum = 0;
-    for (int i = mid; i <= r; ++i) {
+    for (int i = mid + 1; i <= r; ++i) {
         sum += v[i];
         if (sum > rightSum) rightSum = sum;
     }
@@ -30,10 +31,10 @@ int64_t max_subarr_between(const vector<int64_t> &v, const long l, const long r,
 
 int64_t max_subarr_subseq(const vector<int64_t> &v, const long l, const long r) {
     if (l == r) {
-        cout << l << endl;
+        //cout << l << endl;
         return v[l];
     }
-    cout << l << ", " << r << endl;
+    //cout << l << ", " << r << endl;
     const long mid = (r - l) / 2 + l;
     const int64_t leftSum = max_subarr_subseq(v, l, mid);
     const int64_t rightSum = max_subarr_subseq(v, mid + 1, r);
@@ -48,17 +49,17 @@ inline int64_t max_subarr_subseq(vector<int64_t> &v) {
 vector<int64_t> fillVec() {
     long n;
     cin >> n;
-    vector<int64_t> v;
-    int64_t data;
-    for (int i = 0; i < n; ++i) {
-        cin >> data;
-        v.push_back(data);
-    }
+    vector<int64_t> v(n); // allocate a vector with n elements
+    for (int i = 0; i < n; ++i) cin >> v[i];
     return v;
 }
 
 int main(void) {
-    vector<int64_t> v = {2, -5, 8, 6, -2, 5};
+    // test
+    //vector<int64_t> v = {2, -5, 8, 6, -2, 5};
+    //vector<int64_t> v = {1, -3, 2, -5, 7, 6, -1, -4, 11, -23};
+    
+    vector<int64_t> v = fillVec();
 
     int64_t ans = max_subarr_subseq(v);
     cout << ans;
