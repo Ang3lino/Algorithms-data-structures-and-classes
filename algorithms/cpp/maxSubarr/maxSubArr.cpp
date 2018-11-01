@@ -29,10 +29,13 @@ int64_t max_subarr_between(const vector<int64_t> &v, const long l, const long r,
 }
 
 int64_t max_subarr_subseq(const vector<int64_t> &v, const long l, const long r) {
-    if (abs(r - l) == 1) return v[l];
-    //cout << l << r << endl;
+    if (l == r) {
+        cout << l << endl;
+        return v[l];
+    }
+    cout << l << ", " << r << endl;
     const long mid = (r - l) / 2 + l;
-    const int64_t leftSum = max_subarr_subseq(v, l, mid - 1);
+    const int64_t leftSum = max_subarr_subseq(v, l, mid);
     const int64_t rightSum = max_subarr_subseq(v, mid + 1, r);
     const int64_t midSum = max_subarr_between(v, l, r, mid);
     return max(leftSum, max(rightSum, midSum));
