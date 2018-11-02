@@ -52,12 +52,21 @@ vector<T> slice_vector(const vector<T> &src, const int &low, const int &high) {
 }
 
 double min_middle(const vector<double_pair> &xsorted, const vector<double_pair> &ysorted, 
-        const double offset) {
-    double min = DBL_MAX;
+        const double offset, const double d) {
 
+    double min = DBL_MAX;
     vector<double_pair> center_pairs;
-    copy_if(xsorted.begin(), xsorted.end(), center_pairs.begin(), 
-        [&](const double_pair p) { return abs(p.first) <= offset; }); // TODO
+    auto in_limit = [&](const double_pair p) { return abs(p.first) <= offset + d; };
+    copy_if(xsorted.begin(), xsorted.end(), center_pairs.begin(), in_limit); // TODO
+
+    for (int j = 0; j < ysorted.size() - 1; ++j) {
+        if (abs(center_pairs[j].first - center_pairs[j].second) < d) {
+            double curr_dist = dist(center_pairs[j], center_pairs[j + 1]);
+            if (curr_dist < min) min = curr_dist;
+        }
+    }
+
+    return min;
 }
 
 // always returns a positive value
@@ -76,7 +85,7 @@ double min_dist(const vector<double_pair> &xsort, const vector<double_pair> &yso
 
     const double min_left = min_dist(left, ysort), min_right = min_dist(right, ysort);
     const double min_sides = min(min_left, min_right);
-    const double min_mid = min_middle(xsort, ysort, min_sides));
+    const double min_mid = min_middle(xsort, ysort, mid_pair.first, min_sides);
 
     return min(min_sides, min_mid);
 }
