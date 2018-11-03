@@ -3,17 +3,24 @@
 #include <vector>
 #include <array>
 #include <functional>
+#include <stack>
 
 #include <stdint.h>
 
 using namespace std;
 
+long inversion_count;
+
 template<typename t>
 void merge(vector<t> &dst, vector<t> &left, vector<t> &right) {
     int i = 0, j = 0, k = 0;
-    const int ndst = dst.size(), nleft = left.size(), nright = right.size();
+    const int nleft = left.size(), nright = right.size();
     while (i < nleft && j < nright) {
-        ( (left[i] <= right[j]) ? dst[k] = left[i++] : dst[k] = right[j++] );
+        if (left[i] <= right[j]) dst[k] = left[i++];
+        else {
+            dst[k] = right[j++];
+            ++inversion_count;
+        }
         ++k;
     }
     while (i < nleft) {
@@ -46,12 +53,6 @@ void mergesort(vector<t> &v) {
 
 }
 
-long inversion_count(vector<long> v) {
-    int count;
-
-    return count;
-}
-
 vector<long> scanv() {
     int n;
     cin >> n;
@@ -64,18 +65,19 @@ vector<long> scanv() {
 int main(int argc, char const *argv[])
 {
     int t;
-    //cin >> t;
-
-    /*
+    
+    cin >> t;
+    vector<long> counts;
     while (t--) {
         vector<long> v = scanv();
-        cout << inversion_count(v) << endl;
+        inversion_count = 0;
+        mergesort(v);
+        counts.push_back(inversion_count);
     }    
-    */
-
-    vector<long> v = { 2, 4, 1, 6, 8, 5, 9 };
-    mergesort(v);
-
+    //vector<long> v = { 2, 4, 1, 6, 8, 5, 9 };
+    cout << endl;
+    for (auto &l: counts) cout << l << endl;
     cout << endl;
     return 0;
+
 }
