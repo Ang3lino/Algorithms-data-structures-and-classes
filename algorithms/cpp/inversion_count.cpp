@@ -9,7 +9,7 @@
 
 using namespace std;
 
-long inversion_count;
+long inversion_count = 0;
 
 template<typename t>
 void merge(vector<t> &dst, vector<t> &left, vector<t> &right) {
@@ -62,22 +62,29 @@ vector<long> scanv() {
     return v;
 }
 
+template<typename t> 
+void print(vector<t> v) {
+    cout << endl;
+    for (auto &x: v) cout << x << " ";
+    cout << endl;
+}
+
 int main(int argc, char const *argv[])
 {
     int t;
     
-    cin >> t;
-    vector<long> counts;
-    while (t--) {
-        vector<long> v = scanv();
-        inversion_count = 0;
-        mergesort(v);
-        counts.push_back(inversion_count);
-    }    
+    //cin >> t;
+    //vector<long> counts;
+    //while (t--) {
+    //    vector<long> v = scanv();
+    //    inversion_count = 0;
+    //    mergesort(v);
+    //    counts.push_back(inversion_count);
+    //}    
     //vector<long> v = { 2, 4, 1, 6, 8, 5, 9 };
-    cout << endl;
-    for (auto &l: counts) cout << l << endl;
-    cout << endl;
+    vector<long> v = { 2, 4, 1, 3, 5 };
+    mergesort(v);
+    cout << inversion_count << endl;
     return 0;
 
 }
