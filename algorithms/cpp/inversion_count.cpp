@@ -19,7 +19,7 @@ void merge(vector<t> &dst, vector<t> &left, vector<t> &right) {
         if (left[i] <= right[j]) dst[k] = left[i++];
         else {
             dst[k] = right[j++];
-            ++inversion_count;
+            inversion_count;
         }
         ++k;
     }
